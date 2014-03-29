@@ -3,7 +3,6 @@ package net.edgecraft.edgecuboid.commands;
 import net.edgecraft.edgeconomy.EdgeConomyAPI;
 import net.edgecraft.edgeconomy.economy.BankAccount;
 import net.edgecraft.edgecore.EdgeCore;
-import net.edgecraft.edgecore.EdgeCoreAPI;
 import net.edgecraft.edgecore.command.AbstractCommand;
 import net.edgecraft.edgecore.command.Level;
 import net.edgecraft.edgecore.user.User;
@@ -11,11 +10,8 @@ import net.edgecraft.edgecuboid.EdgeCuboid;
 import net.edgecraft.edgecuboid.EdgeCuboidAPI;
 import net.edgecraft.edgecuboid.cuboid.CuboidHandler;
 import net.edgecraft.edgecuboid.cuboid.Habitat;
-import net.edgecraft.edgecuboid.cuboid.Upgrade;
-import net.edgecraft.edgecuboid.cuboid.Upgrade.UpgradeType;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -286,108 +282,11 @@ public class HomeCommand extends AbstractCommand {
 				}
 			}
 			
-			if (!Level.canUse(user, Level.ARCHITECT)) {
-				player.sendMessage(lang.getColoredMessage(userLang, "nopermission"));
+			if (args[1].equalsIgnoreCase("info")) {
+				player.sendMessage(lang.getColoredMessage(userLang, "pluginexception").replace("[0]", "EdgeCuboid"));
 				return true;
 			}
-			
-			if (args[1].equalsIgnoreCase("upgrade")) {
-				if (!Level.canUse(user, Level.ARCHITECT)) {
-					player.sendMessage(lang.getColoredMessage(userLang, "nopermission"));
-					return true;
-				}
-				
-				if (args.length == 2) {
-					player.sendMessage(EdgeCore.usageColor + "/home upgrade unlock <habitat> <upgrade>");
-					player.sendMessage(EdgeCore.usageColor + "/home upgrade remove <habitat> <upgrade>");
-					player.sendMessage(EdgeCore.usageColor + "/home upgrade list");
-					
-					return true;
-				}
-				
-				if (args[2].equalsIgnoreCase("unlock")) {
-					if (args.length != 5) {
-						sendUsage(player);
-						return true;
-					}
-										
-					Habitat habitat = cuboidHandler.getHabitat(args[3]);
-					
-					if (habitat == null) {
-						player.sendMessage(lang.getColoredMessage(userLang, "unknowncuboid").replace("[0]", args[3]));
-						return true;
-					}
-										
-					Upgrade upgrade = new Upgrade(UpgradeType.valueOf(args[4]));
-					
-					if (habitat.getUpgrades().containsKey(upgrade) && !upgrade.multipleUsage()) {
-						player.sendMessage(lang.getColoredMessage(userLang, "admin_upgrade_unlock_notmultiple"));
-						return true;
-					}
-					
-					habitat.getUpgrades().put(upgrade, habitat.getUpgrades().get(upgrade) + 1);
-					player.sendMessage(lang.getColoredMessage(userLang, "admin_upgrade_unlock_success").replace("[0]", upgrade.getTypeName())
-																									.replace("[1]", habitat.getCuboid().getName())
-																									.replace("[2]", habitat.getUpgrades().get(upgrade) + ""));
-					
-					return true;
-				}
-				
-				if (args[2].equalsIgnoreCase("remove")) {
-					if (args.length != 5) {
-						sendUsage(player);
-						return true;
-					}
-					
-					Habitat habitat = cuboidHandler.getHabitat(args[3]);
-					
-					if (habitat == null) {
-						player.sendMessage(lang.getColoredMessage(userLang, "unknowncuboid").replace("[0]", args[3]));
-						return true;
-					}
-										
-					Upgrade upgrade = new Upgrade(UpgradeType.valueOf(args[4]));
-					
-					if (!habitat.getUpgrades().containsKey(upgrade)) {
-						player.sendMessage(lang.getColoredMessage(userLang, "admin_upgrade_remove_notunlocked"));
-						return true;
-					}
-					
-					if (habitat.getUpgrades().get(upgrade) == 0) {
-						
-						habitat.getUpgrades().remove(upgrade);
-						player.sendMessage(lang.getColoredMessage(userLang, "admin_upgrade_unlock_success").replace("[0]", upgrade.getTypeName())
-																										.replace("[1]", habitat.getCuboid().getName())
-																										.replace("[2]", habitat.getUpgrades().get(upgrade) + ""));
-						
-						return true;
-					}
-					
-					habitat.getUpgrades().put(upgrade, habitat.getUpgrades().get(upgrade) - 1);
-					player.sendMessage(lang.getColoredMessage(userLang, "admin_upgrade_unlock_success").replace("[0]", upgrade.getTypeName())
-																									.replace("[1]", habitat.getCuboid().getName())
-																									.replace("[2]", habitat.getUpgrades().get(upgrade) + ""));
-					
-					return true;
-				}
-				
-				if (args[2].equalsIgnoreCase("list")) {
-					
-					StringBuilder sb = new StringBuilder();
-					
-					for (UpgradeType upgrade : Upgrade.UpgradeType.values()) {
-						if (sb.length() > 0)
-							sb.append(", ");
-						
-						sb.append(ChatColor.GOLD + upgrade.getName());
-					}
-					
-					player.sendMessage(lang.getColoredMessage(userLang, "home_upgrade_list").replace("[0]", sb.toString()));
-					
-					return true;
-				}
-			}
-			
+									
 		} catch(NumberFormatException e) {
 			player.sendMessage(lang.getColoredMessage(userLang, "numberformatexception"));
 		}
@@ -405,11 +304,6 @@ public class HomeCommand extends AbstractCommand {
 		sender.sendMessage(EdgeCore.usageColor + "/home rent <rental> [<habitat>]");
 		sender.sendMessage(EdgeCore.usageColor + "/home info [<habitat>]");
 		
-		User u = EdgeCoreAPI.userAPI().getUser(sender.getName());
-		
-		if (u == null || !Level.canUse(u, Level.ARCHITECT)) return;
-		
-		sender.sendMessage(EdgeCore.usageColor + "/home upgrade");
 	}
 
 	@Override

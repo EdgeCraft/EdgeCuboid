@@ -95,10 +95,10 @@ public class ShopHandler {
 		ShopHandler.looseInvOnDeath = var;
 	}
 	
-	public void registerShop(Cuboid c, ShopType type, String owner, double price, boolean buyable, double rental, boolean rentable, Map<EdgeItemStack, Double> guiItems, double income, boolean distribution) {		
+	public void registerShop(Cuboid c, ShopType type, String owner, boolean buyable, double rental, boolean rentable, Map<EdgeItemStack, Double> guiItems, double income, boolean distribution) {		
 		try {
 			
-			Shop shop = new Shop(c, type, owner, price, buyable, rental, rentable, guiItems, income, distribution);
+			Shop shop = new Shop(c, type, owner, buyable, rental, rentable, guiItems, income, distribution);
 			byte[] shopByteArray = shop.toByteArray();
 			Blob blob = new SerialBlob(shopByteArray);
 			
@@ -208,6 +208,21 @@ public class ShopHandler {
 	public void synchronizeShop(int id) {
 		try {
 			
+			if (existsShop(id)) {
+				byte[] array = getShop(id).toByteArray();
+				
+				PreparedStatement sync = db.prepareUpdate("UPDATE " + ShopHandler.shopTable + " SET shop = ? WHERE cuboidid = '" + id + "';");
+				Blob blob = new SerialBlob(array);
+				
+				sync.setBlob(1, blob);
+				sync.executeUpdate();
+				
+				Shop synced = Shop.toShop(getShop(id).toByteArray());
+				getShops().put(id, synced);
+				
+				return;
+			}
+			
 			List<Map<String, Object>> results = db.getResults("SELECT * FROM " + ShopHandler.shopTable + " WHERE cuboidid = '" + id + "';");
 			
 			if (results.isEmpty()) {
@@ -218,25 +233,6 @@ public class ShopHandler {
 			byte[] byteToShop = (byte[]) results.get(0).get("shop");
 			
 			Shop shop = Shop.toShop(byteToShop);
-			
-			if (getShop(shop.getCuboidID()) != null) {
-				Shop s = shop;
-					
-				if (!s.equals(shop)) {
-					
-					PreparedStatement updateShop = db.prepareUpdate("UPDATE " + ShopHandler.shopTable + " SET cuboidid = ?, shop = ?;");
-					Blob blob = new SerialBlob(s.toByteArray());
-					
-					updateShop.setInt(1, s.getCuboidID());
-					updateShop.setBlob(2, blob);
-					updateShop.executeUpdate();
-					
-					getShops().put(s.getCuboidID(), s);
-				}
-				
-				return;
-			}
-			
 			getShops().put(shop.getCuboidID(), shop);
 			
 		} catch(Exception e) {

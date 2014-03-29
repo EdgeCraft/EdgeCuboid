@@ -69,7 +69,7 @@ public class Shop implements Serializable {
 	
 	protected Shop() { /* Singleton */ }
 	
-	public Shop(Cuboid cuboid, ShopType type, String owner, double price, boolean buyable, double rental, boolean rentable, Map<EdgeItemStack, Double> guiItems, double income, boolean distribution) {
+	public Shop(Cuboid cuboid, ShopType type, String owner, boolean buyable, double rental, boolean rentable, Map<EdgeItemStack, Double> guiItems, double income, boolean distribution) {
 		
 		setCuboid(cuboid);
 		setType(type);
@@ -85,7 +85,7 @@ public class Shop implements Serializable {
 		setIncome(income);
 		setDistribution(distribution);
 		
-		setupShopGui();		
+		setupShopGui();
 	}
 	
 	public static Shop toShop(byte[] byteArray) {
@@ -123,28 +123,28 @@ public class Shop implements Serializable {
 		}
 	}
 	
-	private Map<String, Object> serialize() {
+	private Map<String, Object> serialize() {	
 		Map<String, Object> infoMap = new LinkedHashMap<String, Object>();		
 		infoMap.put("object-type", "Shop");
 		
 		infoMap.put("cuboid", getCuboidID());
 		infoMap.put("shop-type", getType());
-		infoMap.put("owner", getOwner());
+		infoMap.put("owner", owner);
 		calculatePrice();
 		
-		infoMap.put("buyable", isBuyable());
-		infoMap.put("rental", getRental());
-		infoMap.put("rentable", isRentable());
-		infoMap.put("gui-items", getGuiItems());
-		infoMap.put("income", getIncome());
-		infoMap.put("distribution", isDistributionAllowed());
+		infoMap.put("buyable", buyable);
+		infoMap.put("rental", rental);
+		infoMap.put("rentable", rentable);
+		infoMap.put("gui-items", guiItems);
+		infoMap.put("income", income);
+		infoMap.put("distribution", allowDistribution);
 		
 		return infoMap;
 	}
 	
 	@SuppressWarnings("unchecked")
 	private void deserialize(Map<String, Object> infoMap) {
-		if (!infoMap.containsKey("object-type") || !infoMap.get("object-type").equals("Shop")) throw new java.util.UnknownFormatFlagsException("No Shop!");	
+		if (!infoMap.containsKey("object-type") || !infoMap.get("object-type").equals("Shop")) throw new java.util.UnknownFormatFlagsException("No Shop!");
 		
 		setCuboid(CuboidHandler.getInstance().getCuboid((int) infoMap.get("cuboid")));
 		setType((ShopType) infoMap.get("shop-type"));
@@ -204,7 +204,6 @@ public class Shop implements Serializable {
 	}
 	
 	public double getPrice() {
-		calculatePrice();
 		return price;
 	}
 	
@@ -213,10 +212,11 @@ public class Shop implements Serializable {
 	}
 	
 	private void calculatePrice() {
-		if (getCuboid().getArea() * getGuiItems().size() / 100 <= 0.0D)
-			this.price = 1.0D;
+		System.out.println(getCuboid() + " - " + getCuboid().getArea());
+		if ((double) getCuboid().getArea() * getGuiItems().size() / 100 <= 0)
+			this.price = 1;
 		else
-			this.price = (getCuboid().getArea() * getGuiItems().size() / 100);
+			price = (double) getCuboid().getArea() * getGuiItems().size() / 100;
 	}
 	
 	public boolean isBuyable() {
@@ -240,12 +240,11 @@ public class Shop implements Serializable {
 	}
 	
 	public double getItemPrice(EdgeItemStack item) {
-		if (item != null) {
+		if (item != null)
 			for (EdgeItemStack gui : getGuiItems().keySet()) {
 				if (gui.getType().name().equals(item.getType().name()))
-					return (double) getGuiItems().get(gui);
+					return getGuiItems().get(gui);
 			}
-		}
 		
 		return 0.0D;
 	}
@@ -272,12 +271,14 @@ public class Shop implements Serializable {
 	}
 
 	protected void setCuboid(Cuboid cuboid) {
-		if (cuboid != null)
+		if (cuboid != null) {
 			this.cuboid = cuboid;
+			setCuboidID(cuboid.getID());
+		}
 	}
 
-	protected void setCuboidID(int cuboidID) {
-		if (cuboidID == getCuboid().getID())
+	private void setCuboidID(int cuboidID) {
+		if (getCuboid().getID() == cuboidID)
 			this.cuboidID = cuboidID;
 	}
 	
@@ -343,7 +344,7 @@ public class Shop implements Serializable {
 		setupShopGui();
 	}
 	
-	public void addItem(EdgeItemStack item, double pricePerItem) {
+	public void addItem(EdgeItemStack item, double pricePerItem) {		
 		getGuiItems().put(item, pricePerItem);
 		setupShopGui();
 	}
@@ -372,7 +373,11 @@ public class Shop implements Serializable {
 	public synchronized void buyItem(EconomyPlayer ep, EdgeItemStack guiItem) {
 		try {
 			
-			if (!getGuiItems().containsKey(guiItem)) return;
+			for (EdgeItemStack item : getGuiItems().keySet()) {
+				if (!item.getType().name().equals(guiItem.getType().name()))
+					return;
+			}
+			
 			if (getItemPrice(guiItem) > ep.getCash()) {
 				ep.getUser().getPlayer().sendMessage(lang.getColoredMessage(ep.getUser().getLanguage(), "notenoughmoney"));
 				return;
@@ -398,7 +403,11 @@ public class Shop implements Serializable {
 	public synchronized void buyItem(BankAccount acc, EdgeItemStack guiItem) {
 		try {
 			
-			if (!getGuiItems().containsKey(guiItem)) return;
+			for (EdgeItemStack item : getGuiItems().keySet()) {
+				if (!item.getType().name().equals(guiItem.getType().name()))
+					return;
+			}
+			
 			if (getItemPrice(guiItem) > acc.getBalance()) {
 				acc.getUser().getPlayer().sendMessage(lang.getColoredMessage(acc.getUser().getLanguage(), "notenoughmoney"));
 				return;
@@ -426,7 +435,11 @@ public class Shop implements Serializable {
 	public synchronized void sellItem(EconomyPlayer ep, EdgeItemStack guiItem) {
 		try {
 			
-			if (!getGuiItems().containsKey(guiItem)) return;
+			for (EdgeItemStack item : getGuiItems().keySet()) {
+				if (!item.getType().name().equals(guiItem.getType().name()))
+					return;
+			}
+			
 			if (!isDistributionAllowed()) return;
 			
 			Player player = ep.getUser().getPlayer();
@@ -465,7 +478,11 @@ public class Shop implements Serializable {
 	public synchronized void sellItem(BankAccount acc, EdgeItemStack guiItem) {
 		try {
 			
-			if (!getGuiItems().containsKey(guiItem)) return;
+			for (EdgeItemStack item : getGuiItems().keySet()) {
+				if (!item.getType().name().equals(guiItem.getType().name()))
+					return;
+			}
+			
 			if (!isDistributionAllowed()) return;
 			
 			Player player = acc.getUser().getPlayer();

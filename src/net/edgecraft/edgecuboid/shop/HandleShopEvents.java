@@ -3,6 +3,8 @@ package net.edgecraft.edgecuboid.shop;
 import net.edgecraft.edgeconomy.EdgeConomyAPI;
 import net.edgecraft.edgeconomy.economy.BankAccount;
 import net.edgecraft.edgeconomy.economy.EconomyPlayer;
+import net.edgecraft.edgecore.command.Level;
+import net.edgecraft.edgecore.user.UserManager;
 import net.edgecraft.edgecuboid.cuboid.Cuboid;
 import net.edgecraft.edgecuboid.other.EdgeItemStack;
 
@@ -25,6 +27,9 @@ public class HandleShopEvents implements Listener {
 			Player player = event.getPlayer();
 			Block block = event.getClickedBlock();
 			Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
+			
+			if (!Level.canUse(UserManager.getInstance().getUser(player.getName()), Level.USER))
+				return;
 			
 			if (cuboid != null) {
 				if (!cuboid.isInside(block.getLocation()))
@@ -51,6 +56,9 @@ public class HandleShopEvents implements Listener {
 			Player player = (Player) event.getWhoClicked();
 			Inventory inventory = event.getInventory();
 			Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
+			
+			if (!Level.canUse(UserManager.getInstance().getUser(player.getName()), Level.USER))
+				return;
 			
 			if (cuboid != null) {
 				
@@ -92,6 +100,9 @@ public class HandleShopEvents implements Listener {
 			Player player = (Player) event.getWhoClicked();
 			Inventory inventory = event.getInventory();
 			Cuboid cuboid = Cuboid.getCuboid(player.getLocation());
+			
+			if (!Level.canUse(UserManager.getInstance().getUser(player.getName()), Level.USER))
+				return;
 			
 			if (cuboid != null) {
 				

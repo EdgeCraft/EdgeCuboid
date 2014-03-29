@@ -1,7 +1,11 @@
 package net.edgecraft.edgecuboid.commands;
 
+import java.util.Arrays;
+import java.util.List;
+
 import net.edgecraft.edgeconomy.EdgeConomyAPI;
 import net.edgecraft.edgeconomy.economy.BankAccount;
+import net.edgecraft.edgeconomy.economy.Economy;
 import net.edgecraft.edgecore.EdgeCore;
 import net.edgecraft.edgecore.EdgeCoreAPI;
 import net.edgecraft.edgecore.command.AbstractCommand;
@@ -21,6 +25,7 @@ import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class ShopCommand extends AbstractCommand {
 	
@@ -36,7 +41,7 @@ public class ShopCommand extends AbstractCommand {
 	
 	@Override
 	public Level getLevel() {
-		return Level.USER;
+		return Level.DEVELOPER;
 	}
 
 	@Override
@@ -250,7 +255,7 @@ public class ShopCommand extends AbstractCommand {
 			}
 			
 			if (args[1].equalsIgnoreCase("providing")) {
-				if (args.length != 3) {
+				if (args.length != 4) {
 					sendUsage(player);
 					return true;
 				}
@@ -279,7 +284,30 @@ public class ShopCommand extends AbstractCommand {
 			}
 			
 			if (args[1].equalsIgnoreCase("overview")) {
-				player.sendMessage(lang.getColoredMessage(userLang, "globalerror"));
+				if (args.length != 2) {
+					sendUsage(player);
+					return true;
+				}
+				
+				if (shopHandler.getShop(player.getName()) == null) {
+					player.sendMessage(lang.getColoredMessage(userLang, "noshop"));
+					return true;
+				}
+				
+				Shop shop = shopHandler.getShop(player.getName());
+				
+				player.sendMessage(lang.getColoredMessage(userLang, "shop_info_title").replace("[0]", shop.getCuboid().getName()));
+				player.sendMessage(lang.getColoredMessage(userLang, "shop_info_name").replace("[0]", shop.getCuboid().getName()));
+				player.sendMessage(lang.getColoredMessage(userLang, "shop_info_owner").replace("[0]", shop.getOwner()));
+				player.sendMessage(lang.getColoredMessage(userLang, "shop_info_type").replace("[0]", shop.getType().name()));
+				player.sendMessage(lang.getColoredMessage(userLang, "shop_info_price").replace("[0]", shop.getPrice() + ""));
+				player.sendMessage(lang.getColoredMessage(userLang, "shop_info_area").replace("[0]", shop.getCuboid().getArea() + "")
+						.replace("[1]", shop.getCuboid().getSizeX() + "")
+						.replace("[2]", shop.getCuboid().getSizeY() + "")
+						.replace("[3]", shop.getCuboid().getSizeZ() + ""));
+				player.sendMessage(lang.getColoredMessage(userLang, "shop_info_income").replace("[0]", shop.getIncome() + ""));
+				player.sendMessage(lang.getColoredMessage(userLang, "shop_info_lastcostumer").replace("[0]", shop.getLastCostumer()));
+				
 				return  true;
 			}
 			
@@ -311,7 +339,7 @@ public class ShopCommand extends AbstractCommand {
 					
 					ShopType type = ShopType.valueOf(args[3]);
 					
-					shopHandler.registerShop(cuboid, type, player.getName(), 2500D, false, 0, false, null, 0, false);
+					shopHandler.registerShop(cuboid, type, player.getName(), false, 0, false, null, 0, false);
 					player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_create_success").replace("[0]", args[2]));
 					
 					return true;
@@ -343,12 +371,11 @@ public class ShopCommand extends AbstractCommand {
 					
 					ShopType type = ShopType.valueOf(args[3]);
 					
-					shopHandler.registerShop(cuboid, type, args[4], 2500D, false, 0, false, null, 0, false);
-					player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_create_success_owner").replace("[0]", args[2]));
+					shopHandler.registerShop(cuboid, type, args[4], false, 0, false, null, 0, false);
+					player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_create_success_owner").replace("[0]", args[2]).replace("[1]", args[4]));
 					
 					return true;
 				}
-				
 			}
 			
 			if (args[1].equalsIgnoreCase("recreate")) {
@@ -362,7 +389,7 @@ public class ShopCommand extends AbstractCommand {
 					return true;
 				}
 				
-				Shop shop = shopHandler.getShop(args[2]);
+				Shop shop = shopHandler.getShop(CuboidHandler.getInstance().getCuboid(args[2]));
 				
 				if (shop == null) {
 					player.sendMessage(lang.getColoredMessage(userLang, "unknownshop").replace("[0]", args[2]));
@@ -385,7 +412,7 @@ public class ShopCommand extends AbstractCommand {
 				}
 				
 				shopHandler.deleteShop(shopHandler.getShop(CuboidHandler.getInstance().getCuboid(args[2])).getCuboidID());
-				player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_delete_success"));
+				player.sendMessage(lang.getColoredMessage(userLang, "admin_shop_delete_success").replace("[0]", args[2]));
 				
 				return true;					
 			}
@@ -527,6 +554,32 @@ public class ShopCommand extends AbstractCommand {
 				}
 			}
 			
+			if (args[1].equalsIgnoreCase("info")) {
+				if (args.length != 3) {
+					sendUsage(player);
+					return true;
+				}
+				
+				if (shopHandler.getShop(args[2]) == null) {
+					player.sendMessage(lang.getColoredMessage(userLang, "unknownshop").replace("[0]", args[2]));
+					return true;
+				}
+				
+				Shop shop = shopHandler.getShop(CuboidHandler.getInstance().getCuboid(args[2]));
+				
+				player.sendMessage(lang.getColoredMessage(userLang, "shop_info_title").replace("[0]", shop.getCuboid().getName()));
+				player.sendMessage(lang.getColoredMessage(userLang, "shop_info_name").replace("[0]", shop.getCuboid().getName()));
+				player.sendMessage(lang.getColoredMessage(userLang, "shop_info_owner").replace("[0]", shop.getOwner()));
+				player.sendMessage(lang.getColoredMessage(userLang, "shop_info_type").replace("[0]", shop.getType().name()));
+				player.sendMessage(lang.getColoredMessage(userLang, "shop_info_price").replace("[0]", shop.getPrice() + ""));
+				player.sendMessage(lang.getColoredMessage(userLang, "shop_info_area").replace("[0]", shop.getCuboid().getArea() + "")
+						.replace("[1]", shop.getCuboid().getSizeX() + "")
+						.replace("[2]", shop.getCuboid().getSizeY() + "")
+						.replace("[3]", shop.getCuboid().getSizeZ() + ""));
+				player.sendMessage(lang.getColoredMessage(userLang, "shop_info_income").replace("[0]", shop.getIncome() + ""));
+				player.sendMessage(lang.getColoredMessage(userLang, "shop_info_lastcostumer").replace("[0]", shop.getLastCostumer()));
+			}
+			
 			if (args[1].equalsIgnoreCase("types")) {
 				if (args.length != 2) {
 					sendUsage(player);
@@ -560,7 +613,7 @@ public class ShopCommand extends AbstractCommand {
 		
 		sender.sendMessage(EdgeCore.usageColor + "/shop buy <shop>");
 		sender.sendMessage(EdgeCore.usageColor + "/shop rent <shop>");
-		sender.sendMessage(EdgeCore.usageColor + "/shop additem §m[<amount>] §c<price>");
+		sender.sendMessage(EdgeCore.usageColor + "/shop additem §m[<amount>]§c <price>");
 		sender.sendMessage(EdgeCore.usageColor + "/shop getitem §m[<amount>]");
 		sender.sendMessage(EdgeCore.usageColor + "/shop itemprice <item> <price>");
 		sender.sendMessage(EdgeCore.usageColor + "/shop near <distance>");
@@ -578,9 +631,10 @@ public class ShopCommand extends AbstractCommand {
 		sender.sendMessage(EdgeCore.usageColor + "/shop setbuyable <shop> <boolean>");
 		sender.sendMessage(EdgeCore.usageColor + "/shop setrental <shop> <rental>");
 		sender.sendMessage(EdgeCore.usageColor + "/shop setrentable <shop> <boolean>");
+		sender.sendMessage(EdgeCore.usageColor + "/shop info <shop>");
 		sender.sendMessage(EdgeCore.usageColor + "/shop types");
 	}
-	
+
 	@Override
 	public boolean sysAccess(CommandSender arg0, String[] arg1) {
 		return true;
@@ -598,6 +652,14 @@ public class ShopCommand extends AbstractCommand {
 			sender.sendMessage(lang.getColoredMessage(user.getLanguage(), "invaliditem"));
 			return;
 		}
+		
+		ItemMeta meta = item.getItemMeta();
+		meta.setDisplayName(ChatColor.AQUA + item.getType().name());
+
+		List<String> lore = Arrays.asList(new String[] { ChatColor.BLUE + Economy.getCurrency() + price});
+		meta.setLore(lore);
+		
+		item.setItemMeta(meta);
 		
 		EdgeItemStack guiItem = new EdgeItemStack(item);
 		

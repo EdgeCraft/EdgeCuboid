@@ -14,6 +14,7 @@ import net.edgecraft.edgecuboid.other.ConfigHandler;
 import net.edgecraft.edgecuboid.other.CuboidCommands;
 import net.edgecraft.edgecuboid.other.CuboidSynchronizationTask;
 import net.edgecraft.edgecuboid.other.EventTask;
+import net.edgecraft.edgecuboid.shop.HandleShopEvents;
 import net.edgecraft.edgecuboid.shop.ShopHandler;
 import net.edgecraft.edgecuboid.world.HandleWorldEvents;
 import net.edgecraft.edgecuboid.world.WorldManager;
@@ -41,6 +42,8 @@ public class EdgeCuboid extends JavaPlugin {
 	 */
 	public void onDisable() {
 		cuboidAPI.synchronizeCuboidManagement(true, true);
+		shopAPI.synchronizeShops();
+		
 		log.info(cuboidbanner + "Plugin wurde erfolgreich beendet!");
 	}
 	
@@ -49,6 +52,7 @@ public class EdgeCuboid extends JavaPlugin {
 	 */
 	public void onEnable() {
 		registerData();
+		
 		log.info(cuboidbanner + "Plugin wurde erfolgreich gestartet!");
 	}
 	
@@ -60,8 +64,6 @@ public class EdgeCuboid extends JavaPlugin {
 		
 		this.config.loadConfig();
 		this.config.update();
-		
-		shopAPI.synchronizeShops();
 	}
 	
 	/**
@@ -72,6 +74,7 @@ public class EdgeCuboid extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new HandleWorldEvents(), this);
 		getServer().getPluginManager().registerEvents(new HandleCuboidFlags(), this);
 		getServer().getPluginManager().registerEvents(new HandleCommandEvents(), this);
+		getServer().getPluginManager().registerEvents(new HandleShopEvents(), this);
 		
 		commands.registerCommand( new CommandCollection(CuboidCommands.getInstance()) );
 		

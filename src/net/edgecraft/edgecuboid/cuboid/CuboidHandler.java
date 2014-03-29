@@ -3,6 +3,7 @@ package net.edgecraft.edgecuboid.cuboid;
 import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,6 +19,8 @@ import net.edgecraft.edgecuboid.cuboid.types.CuboidType;
 import net.edgecraft.edgecuboid.cuboid.types.HabitatType;
 
 import org.bukkit.Location;
+
+import com.google.common.collect.Lists;
 
 public class CuboidHandler {
 	
@@ -51,12 +54,38 @@ public class CuboidHandler {
 	}
 	
 	/**
+	 * Returns ???? @lush
+	 * @param type
+	 * @param use
+	 * @return Cuboid
+	 */
+	public Cuboid getCuboid(CuboidType type, boolean use) {
+		
+		List<Cuboid> shuffled = Lists.newArrayList(cuboids.values());
+		Collections.shuffle(shuffled);
+		
+		for (Cuboid cuboid : shuffled) {
+			
+			if (use && cuboid.getCuboidType() == type.getTypeID())
+				return cuboid;
+			
+			if (!use && cuboid.getCuboidType() != type.getTypeID())
+				return cuboid;
+			
+		}
+		
+		return null;
+	}
+	
+	/**
 	 * Returns the nearest cuboid to the given location of the given type
 	 * @param type
 	 * @param loc
 	 * @return Cuboid
 	 */
 	public Cuboid getNearestCuboid(CuboidType type, Location loc) {
+		if (type == null || loc == null) return null;
+		
 		double nearest = 0;
 		Cuboid cuboid = null;
 		
