@@ -7,6 +7,7 @@ import net.edgecraft.edgecuboid.EdgeCuboid;
 import net.edgecraft.edgecuboid.cuboid.Cuboid;
 import net.edgecraft.edgecuboid.cuboid.CuboidEvent;
 import net.edgecraft.edgecuboid.cuboid.CuboidHandler;
+import net.edgecraft.edgecuboid.cuboid.types.CuboidType;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -58,6 +59,16 @@ public class HandleCuboidEvents implements Listener {
 										
 					if (!cuboid.getParticipants().contains(player.getName())) return; // Do not go further for events if players aren't participants
 					
+					if (cuboid.getCuboidType() == CuboidType.Survival.getTypeID()) {
+						
+						player.setGameMode(GameMode.SURVIVAL);
+						
+					} else if(cuboid.getCuboidType() == CuboidType.Creative.getTypeID()) {
+						
+						player.setGameMode(GameMode.CREATIVE);
+						
+					}
+					
 					if (cuboid.hasEvent(CuboidEvent.Heal)) {
 						
 						double health = player.getHealth() + 2D;					
@@ -73,7 +84,7 @@ public class HandleCuboidEvents implements Listener {
 							return;
 						}
 						
-						double health = player.getHealth() - 1D;
+						double health = player.getHealth() - 0.5D;
 						if (health <= 0) health = 0;
 						
 						player.setHealth(health);
@@ -95,16 +106,16 @@ public class HandleCuboidEvents implements Listener {
 					if (cuboid.hasEvent(CuboidEvent.NoEnter)) {						
 						if (!Level.canUse(user, Level.ARCHITECT)) {	
 							if (!cuboid.isInside(from) && cuboid.isInside(to)) {
-								Vector unit = player.getLocation().toVector().subtract(player.getLocation().toVector()).normalize();
-								player.setVelocity(unit.multiply(2));
+								Vector unit = event.getTo().toVector().subtract(event.getFrom().toVector()).normalize();
+								player.setVelocity(unit.multiply(5));
 							}
 						}						
 					}
 					
 					if (!Level.canUse(user, cuboid.getModifyLevel())) {
 						if (!cuboid.isInside(from) && cuboid.isInside(to)) {
-							Vector unit = player.getLocation().toVector().subtract(player.getLocation().toVector()).normalize();
-							player.setVelocity(unit.multiply(2));
+							Vector unit = event.getTo().toVector().subtract(event.getFrom().toVector()).normalize();
+							player.setVelocity(unit.multiply(5));
 						}
 					}
 				}				

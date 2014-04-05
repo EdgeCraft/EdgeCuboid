@@ -51,10 +51,10 @@ public class CuboidCommand extends AbstractCommand {
 		sender.sendMessage(EdgeCore.usageColor + "/cuboid create <name> <type>");
 		sender.sendMessage(EdgeCore.usageColor + "/cuboid recreate <name> [<type>]");
 		sender.sendMessage(EdgeCore.usageColor + "/cuboid delete <cuboid>");
-		sender.sendMessage(EdgeCore.usageColor + "/cuboid commands");
+		sender.sendMessage(EdgeCore.usageColor + "/cuboid command");
 		sender.sendMessage(EdgeCore.usageColor + "/cuboid edit");
-		sender.sendMessage(EdgeCore.usageColor + "/cuboid setowner <new owner>");
-		sender.sendMessage(EdgeCore.usageColor + "/cuboid info <name>");
+		sender.sendMessage(EdgeCore.usageColor + "/cuboid setowner <cuboid> <new owner>");
+		sender.sendMessage(EdgeCore.usageColor + "/cuboid info <cuboid>");
 		sender.sendMessage(EdgeCore.usageColor + "/cuboid types");
 	}
 	
@@ -87,7 +87,7 @@ public class CuboidCommand extends AbstractCommand {
 			c.setName(name);
 			c.switchOwner(user.getID());
 			c.updateCuboidType(type);
-			c.updateModifyLevel(Level.USER);
+			c.updateModifyLevel(Level.ARCHITECT);
 			
 			cuboidHandler.getCreatingPlayers().put(player.getName(), c);				
 			player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_create_start").replace("[0]", WorldManager.getInstance().getCreationItem().name().toLowerCase()));
@@ -122,7 +122,11 @@ public class CuboidCommand extends AbstractCommand {
 		
 		if (args[1].equalsIgnoreCase("command")) {
 			if (args.length == 2) {
-				sendUsage(player);
+				
+				player.sendMessage(EdgeCore.usageColor + "/cuboid command add <command,..>");
+				player.sendMessage(EdgeCore.usageColor + "/cuboid command remove <command,..>");
+				player.sendMessage(EdgeCore.usageColor + "/cuboid check <cuboid> <command>");
+				
 				return true;
 			}
 			
@@ -210,7 +214,11 @@ public class CuboidCommand extends AbstractCommand {
 		
 		if (args[1].equalsIgnoreCase("edit")) {			
 			if (args.length == 2) {
-				sendUsage(player);
+				
+				player.sendMessage(EdgeCore.usageColor + "/cuboid edit entermsg <message>");
+				player.sendMessage(EdgeCore.usageColor + "/cuboid edit leavemsg <message>");
+				player.sendMessage(EdgeCore.usageColor + "/cuboid edit level [<level>]");
+				
 				return true;
 			}
 			
@@ -343,11 +351,6 @@ public class CuboidCommand extends AbstractCommand {
 			return true;
 		}
 		
-		return true;
-	}
-	
-	@Override
-	public boolean sysAccess(CommandSender sender, String[] args) {
 		return true;
 	}
 }

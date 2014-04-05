@@ -102,7 +102,7 @@ public class ShopHandler {
 			byte[] shopByteArray = shop.toByteArray();
 			Blob blob = new SerialBlob(shopByteArray);
 			
-			PreparedStatement registerShop = db.prepareUpdate("INSERT INTO " + ShopHandler.shopTable + " (cuboidid, shop) VALUES (?, ?);");
+			PreparedStatement registerShop = db.prepareStatement("INSERT INTO " + ShopHandler.shopTable + " (cuboidid, shop) VALUES (?, ?);");
 			registerShop.setInt(1, c.getID());
 			registerShop.setBlob(2, blob);
 			registerShop.executeUpdate();
@@ -120,7 +120,7 @@ public class ShopHandler {
 		
 		try {
 			
-			PreparedStatement deleteShop = db.prepareUpdate("DELETE FROM " + ShopHandler.shopTable + " WHERE cuboidid = '" + id + "';");
+			PreparedStatement deleteShop = db.prepareStatement("DELETE FROM " + ShopHandler.shopTable + " WHERE cuboidid = '" + id + "';");
 			deleteShop.executeUpdate();
 			
 			getShops().remove(id);
@@ -211,7 +211,7 @@ public class ShopHandler {
 			if (existsShop(id)) {
 				byte[] array = getShop(id).toByteArray();
 				
-				PreparedStatement sync = db.prepareUpdate("UPDATE " + ShopHandler.shopTable + " SET shop = ? WHERE cuboidid = '" + id + "';");
+				PreparedStatement sync = db.prepareStatement("UPDATE " + ShopHandler.shopTable + " SET shop = ? WHERE cuboidid = '" + id + "';");
 				Blob blob = new SerialBlob(array);
 				
 				sync.setBlob(1, blob);

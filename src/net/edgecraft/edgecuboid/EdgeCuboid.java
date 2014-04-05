@@ -4,7 +4,7 @@ import java.util.logging.Logger;
 
 import net.edgecraft.edgecore.EdgeCore;
 import net.edgecraft.edgecore.EdgeCoreAPI;
-import net.edgecraft.edgecore.command.CommandCollection;
+import net.edgecraft.edgecore.command.CommandContainer;
 import net.edgecraft.edgecore.command.CommandHandler;
 import net.edgecraft.edgecuboid.cuboid.CuboidHandler;
 import net.edgecraft.edgecuboid.events.HandleCommandEvents;
@@ -76,7 +76,7 @@ public class EdgeCuboid extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new HandleCommandEvents(), this);
 		getServer().getPluginManager().registerEvents(new HandleShopEvents(), this);
 		
-		commands.registerCommand( new CommandCollection(CuboidCommands.getInstance()) );
+		commands.registerCommand( new CommandContainer(CuboidCommands.getInstance()) );
 		
 		@SuppressWarnings("unused") BukkitTask eventTask = new EventTask().runTaskTimer(this, 0L, 20L);
 		@SuppressWarnings("unused") BukkitTask syncTask = new CuboidSynchronizationTask().runTaskTimer(this, 0, 20L * 60 * 10);

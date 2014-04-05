@@ -253,6 +253,7 @@ public class Habitat implements Serializable {
 	 */
 	public void unlockUpgrade(Upgrade upgrade) {
 		if(!upgrade.multipleUsage()) return;
+		if (getType() != HabitatType.House || getType() != HabitatType.Villa) return;
 		
 		if (getUpgrades().containsKey(upgrade)) {
 			if (upgrade.multipleUsage())

@@ -257,7 +257,7 @@ public class CuboidHandler {
 			Blob blob = null;
 			blob = new SerialBlob(cuboidByteArray);
 			
-			PreparedStatement registerCuboid = db.prepareUpdate("INSERT INTO " + CuboidHandler.cuboidTable + " (id, cuboid) VALUES (?, ?);");
+			PreparedStatement registerCuboid = db.prepareStatement("INSERT INTO " + CuboidHandler.cuboidTable + " (id, cuboid) VALUES (?, ?);");
 			registerCuboid.setInt(1, cuboid.getID());
 			registerCuboid.setBlob(2, blob);
 			registerCuboid.executeUpdate();
@@ -279,7 +279,7 @@ public class CuboidHandler {
 		
 		try {
 			
-			PreparedStatement deleteCuboid = db.prepareUpdate("DELETE FROM " + CuboidHandler.cuboidTable + " WHERE id = '" + id + "';");
+			PreparedStatement deleteCuboid = db.prepareStatement("DELETE FROM " + CuboidHandler.cuboidTable + " WHERE id = '" + id + "';");
 			deleteCuboid.executeUpdate();
 			
 			getCuboids().remove(id);
@@ -309,7 +309,7 @@ public class CuboidHandler {
 			byte[] habitatByteArray = h.toByteArray();
 			Blob blob = new SerialBlob(habitatByteArray);
 			
-			PreparedStatement registerHabitat = db.prepareUpdate("INSERT INTO " + CuboidHandler.habitatTable + " (cuboidid, habitat) VALUES (?, ?);");
+			PreparedStatement registerHabitat = db.prepareStatement("INSERT INTO " + CuboidHandler.habitatTable + " (cuboidid, habitat) VALUES (?, ?);");
 			registerHabitat.setInt(1, c.getID());
 			registerHabitat.setBlob(2, blob);
 			registerHabitat.executeUpdate();
@@ -331,7 +331,7 @@ public class CuboidHandler {
 		
 		try {
 		 	
-			PreparedStatement deleteHabitat = db.prepareUpdate("DELETE FROM " + CuboidHandler.habitatTable + " WHERE cuboidid = '" + id + "';");
+			PreparedStatement deleteHabitat = db.prepareStatement("DELETE FROM " + CuboidHandler.habitatTable + " WHERE cuboidid = '" + id + "';");
 			deleteHabitat.executeUpdate();
 			
 			getHabitats().remove(id);
@@ -538,7 +538,7 @@ public class CuboidHandler {
 				
 				byte[] array = getCuboid(id).toByteArray();
 				
-				PreparedStatement sync = db.prepareUpdate("UPDATE " + CuboidHandler.cuboidTable + " SET cuboid = ? WHERE id = '" + id + "';");
+				PreparedStatement sync = db.prepareStatement("UPDATE " + CuboidHandler.cuboidTable + " SET cuboid = ? WHERE id = '" + id + "';");
 				Blob blob = new SerialBlob(array);
 				
 				sync.setBlob(1, blob);
@@ -577,7 +577,7 @@ public class CuboidHandler {
 			if (existsHabitat(id)) {
 				byte[] array = getHabitat(id).toByteArray();
 				
-				PreparedStatement sync = db.prepareUpdate("UPDATE " + CuboidHandler.habitatTable + " SET habitat = ? WHERE cuboidid = '" + id + "';");
+				PreparedStatement sync = db.prepareStatement("UPDATE " + CuboidHandler.habitatTable + " SET habitat = ? WHERE cuboidid = '" + id + "';");
 				Blob blob = new SerialBlob(array);
 				
 				sync.setBlob(1, blob);

@@ -122,7 +122,7 @@ public class HandleCommandEvents implements Listener {
 						player.sendMessage(lang.getColoredMessage(user.getLanguage(), "cuboid_find_nocuboid"));
 						return;
 					}
-					
+										
 					player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_info_title").replace("[0]", cuboid.getName()));
 					player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_info_name").replace("[0]", cuboid.getName()));
 					player.sendMessage(lang.getColoredMessage(userLang, "admin_cuboid_info_type").replace("[0]", CuboidType.getType(cuboid.getCuboidType()).name()));

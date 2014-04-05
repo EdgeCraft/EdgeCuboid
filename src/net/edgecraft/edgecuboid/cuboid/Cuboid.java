@@ -409,7 +409,7 @@ public class Cuboid implements Serializable {
 	 * @return Location
 	 */
 	public Location getSpawn() {
-		return spawn;
+		return spawn == null ? Bukkit.getWorlds().get(0).getSpawnLocation() : spawn;
 	}
 	
 	/**

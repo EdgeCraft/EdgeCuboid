@@ -7,17 +7,3 @@ depend: [EdgeCore]
 softdepend: [EdgeConomy]
 
 main: net.edgecraft.edgecuboid.EdgeCuboid
-
-commands:
-    cuboid:
-      description: Cuboid Command
-    ccancel:
-      description: CCancel Command
-    cfind:
-      description: CFind Command
-    event:
-      description: Event Command
-    flag:
-      description: Flag Command
-    habitat:
-      description: Habitat Command
